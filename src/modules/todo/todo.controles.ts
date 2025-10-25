@@ -1,19 +1,12 @@
 import { Request, Response } from "express";
+import prisma from "../../config/prisma";
 
-let data: any = [
-  {
-    name: "prisma",
-    age: 33,
-    url: "hjkghjkj",
-    emaill: "jasmintagaeva@mail.com",
-  },
-];
-
-const getAllData = (req: Request, res: Response) => {
+const getAllData = async (req: Request, res: Response) => {
+  const user = await prisma.user.findMany();
   try {
     res.status(200).json({
       success: true,
-      data,
+      data: user,
     });
   } catch (error) {
     res.status(500).json({
@@ -23,35 +16,30 @@ const getAllData = (req: Request, res: Response) => {
   }
 };
 
-const postAllData = (req: Request, res: Response) => {
-try {
-
- const { name, age, url, emaill } = req.body;
-
-    const newObj = {
-      name,
-      age,
-      url,
-      emaill
-    };
-
-
-  res.status(200).json({
-    success: true,
-    data
-  })
-} catch (error) {
-  res.status(500).json({
-    success: false,
-    error: `Error in postAllData: ${error}`
-  })
-}
-
-}
-
-
+const postAllData = async (req: Request, res: Response) => {
+  try {
+    const { name, age, url, emaill } = req.body;
+    const post = await prisma.user.create({
+      data: {
+        name,
+        age,
+        url,
+        emaill,
+      },
+    });
+    res.status(200).json({
+      success: true,
+      data: post,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: `Error in postAllData: ${error}`,
+    });
+  }
+};
 
 export default {
   getAllData,
-  postAllData
+  postAllData,
 };
